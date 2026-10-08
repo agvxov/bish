@@ -1,0 +1,39 @@
+#!bish
+
+echo "hello world"
+
+set a [ls -la]
+set lerr $err
+puts --
+puts $a
+puts $lerr
+
+proc lol {a} {
+    git-log-short
+}
+
+proc shout {text} { string toupper $text }
+proc count args   { llength $args }
+
+alias dash-dash {puts --}
+
+emit {
+    pipe {ls -la} {grep bish}            ;# pure OS pipeline
+    pipe {echo hi} shout                 ;# shout "hi"
+    pipe {ls -la} {grep bish} * count    ;# count line1 line2 ...
+    pipe {ls} {string cat} {wc -c}       ;# system, Tcl, then system again
+
+    dash-dash
+
+    lines
+    cols
+}
+
+puts [home]
+cd [home]
+puts [slurp .xTheme]
+pop
+
+exec echo {$ echo}
+
+#lol a b
