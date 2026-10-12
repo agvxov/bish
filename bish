@@ -7,10 +7,11 @@ package require Tcl 8.6
 # ---
 
 namespace eval ::bish {
-    namespace export run emit pipe alias
+    namespace export run emit alias
 
     source [file join [file dirname [info script]] builtins.tcl]
     source [file join [file dirname [info script]] lint.tcl]
+    source [file join [file dirname [info script]] gunt.tcl]
 
     variable signals {
         SIGHUP   1
@@ -332,72 +333,6 @@ proc ::bish::is_system {name} {
     expr {[namespace which -command $name] eq ""}
 }
 
-proc ::bish::pipe {args} {
-    set data {}
-    set have 0
-    set split 0
-    set group {}
-    set gdata {}
-    set ghave 0
-
-    foreach stage $args {
-        if {$stage eq "*"} {
-            # Finish any pending OS pipeline to get the output to split.
-            if {[llength $group]} {
-                set data [run_group $group $gdata $ghave]
-                set have 1
-                set group {}
-            }
-            if {!$have} {
-                return -code error "pipe: * must follow a stage"
-            }
-            set split 1
-            continue
-        }
-
-        set name [lindex $stage 0]
-        set argv [lrange $stage 1 end]
-
-        if {[is_system $name]} {
-            if {$split} {
-                # The output becomes arguments, so it can't feed stdin too.
-                lappend argv {*}$data
-                set split 0
-                set gdata {}
-                set ghave 0
-            } elseif {![llength $group]} {
-                set gdata $data
-                set ghave $have
-            }
-            lappend group [list [resolve $name] {*}$argv]
-            continue
-        }
-
-        if {[llength $group]} {
-            set data [run_group $group $gdata $ghave]
-            set have 1
-            set group {}
-        }
-        if {$have} {
-            if {$split} {
-                lappend argv {*}$data
-            } else {
-                lappend argv $data
-            }
-        }
-        set split 0
-        set data [uplevel 1 [list $name {*}$argv]]
-        set have 1
-    }
-
-    if {$split} {
-        return -code error "pipe: * must be followed by a stage"
-    }
-    if {[llength $group]} {
-        set data [run_group $group $gdata $ghave]
-    }
-    return $data
-}
 
 # ---
 # Entry point

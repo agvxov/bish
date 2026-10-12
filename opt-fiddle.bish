@@ -1,0 +1,40 @@
+#!bish
+
+set opts {
+    {h help}
+    {v version}
+    {c my-fav-color my-fav-colour}
+    {lol}
+    {f:}
+}
+
+if {[llength $argv] == 0} {
+    puts "thats not how you use this script, bud"
+    exit 2
+}
+
+::bish::getopt $opts $argv {
+    h {
+        puts "help"
+        exit 0
+    }
+    v {
+        puts "version"
+        exit 0
+    }
+    c {
+        puts "red"
+    }
+    lol {
+        puts "lmao even"
+    }
+    f {
+        stat $optarg
+    }
+    ? {
+        puts "you drunk or what?"
+        exit 1
+    }
+}
+
+puts "optrem: [list $optrem]"

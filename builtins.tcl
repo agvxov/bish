@@ -51,7 +51,7 @@ proc cols {} {
 # [-] enable
 # [?] fc
 # [?] fg
-# [ ] getopts
+# [x] getopts
 # [?] hash
 # [?] help
 # [?] history

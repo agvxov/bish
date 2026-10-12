@@ -4,5 +4,7 @@ CFLAGS := -O2 -Wall
 CFLAGS += -DUSE_TCL_STUBS $$(pkg-config --cflags tcl)
 LDFLAGS := $$(pkg-config --libs tcl)
 
-libbishc.so: exec.c
-	${CC} -shared -fPIC ${CFLAGS} -o $@ exec.c ${LDFLAGS}
+PLUGINS := bish.c exec.c getopt.c
+
+libbishc.so: ${PLUGINS}
+	${CC} -shared -fPIC ${CFLAGS} -o $@ ${PLUGINS} ${LDFLAGS}

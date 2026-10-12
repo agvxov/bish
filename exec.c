@@ -4,7 +4,7 @@
 #include <signal.h>
 #include <unistd.h>
 
-static int
+int
 Tcl_exec(TCL_ARGS) {
     char **args;
     struct sigaction dfl, old_pipe;
@@ -54,13 +54,4 @@ Tcl_exec(TCL_ARGS) {
         (char*)NULL
     );
     return TCL_ERROR;
-}
-
-int Bishc_Init(Tcl_Interp *interp) {
-    if (Tcl_InitStubs(interp, "8.6", 0) == NULL) {
-        return TCL_ERROR;
-    }
-
-    TCL_EASY_CREATE_COMMAND(exec)
-    return Tcl_PkgProvide(interp, "bishc", "0.1");
 }
