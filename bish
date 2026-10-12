@@ -7,7 +7,7 @@ package require Tcl 8.6
 # ---
 
 namespace eval ::bish {
-    namespace export run emit pipe alias
+    namespace export run emit pipe
 
     source [file join [file dirname [info script]] builtins.tcl]
     source [file join [file dirname [info script]] lint.tcl]
@@ -357,6 +357,12 @@ proc ::bish::pipe {args} {
 
         set name [lindex $stage 0]
         set argv [lrange $stage 1 end]
+
+        set expanded_argv {}
+        foreach arg $argv {
+            lappend expanded_argv [uplevel 1 [list subst $arg]]
+        }
+        set argv $expanded_argv
 
         if {[is_system $name]} {
             if {$split} {

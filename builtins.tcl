@@ -5,6 +5,10 @@ proc home {{name ""}} {
     file normalize ~$name
 }
 
+proc hostname {} {
+    info hostname
+}
+
 proc lines {} {
     set size [invoke stty [resolve stty] size]
     lindex $size 0
@@ -18,6 +22,7 @@ proc cols {} {
 # --- Bournewave
 # Legend:
 #  x : covered
+#  - : will not be implemented
 #    : missing
 #  ? : maybe should cover in the future
 # Coverage:
@@ -29,19 +34,19 @@ proc cols {} {
 # [x] exec
 # [x] exit
 # [ ] export // ?!
-# [ ] readonly
+# [-] readonly
 # [x] return
 # [x] set
-# [ ] shift
+# [-] shift
 # [-] times
 # [x] trap
 # [x] unset
 # [x] alias
 # [?] bg
 # [?] bind
-# [ ] builtin
+# [-] builtin
 # [-] caller
-# [ ] command
+# [-] command
 # [?] compgen
 # [?] complete
 # [?] compopt
@@ -67,7 +72,7 @@ proc cols {} {
 # [x] read
 # [?] readarray
 # [x] source
-# [ ] suspend
+# [-] suspend
 # [-] test
 # [ ] type
 # [-] typeset

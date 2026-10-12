@@ -1,0 +1,66 @@
+#!bish
+#
+# ufetch-gentoo - tiny system info for gentoo
+
+## INFO
+
+set user     $env(USER)
+set host     [hostname]
+set os       "Gentoo Linux"
+set kernel   [uname -sr]
+set uptime   [uptime -p | sed "s/up //"]
+set packages [ls -d {*}[glob /var/db/pkg/*/*] | wc -l]
+set shell    [basename [info nameofexecutable]]
+
+if {![info exists env("WM")]} {
+    if {[info exists env("XDG_CURRENT_DESKTOP")]} {
+        set envtype "DE"
+        set WM env("XDG_CURRENT_DESKTOP")
+    } elseif {[info exists env("DESKTOP_SESSION")]} {
+        set envtype "DE"
+        set WM env("DESKTOP_SESSION")
+    } else {
+        set envtype "WM"
+        set WM [
+            pipe {
+                tail -n 1 "[home]/.xinitrc"
+            } {
+                cut -d ' ' -f 2
+            }
+        ]
+    }
+} else {
+    set envtype "WM"
+}
+
+## DEFINE COLORS
+
+# probably don't change these
+set bold    [tput bold]
+set black   [tput setaf 0]
+set red     [tput setaf 1]
+set green   [tput setaf 2]
+set yellow  [tput setaf 3]
+set blue    [tput setaf 4]
+set magenta [tput setaf 5]
+set cyan    [tput setaf 6]
+set white   [tput setaf 7]
+set reset   [tput sgr0]
+
+# you can change these
+set lc "${reset}${bold}${magenta}"	;# labels
+set nc "${reset}${bold}${magenta}"	;# user and hostname
+set ic "${reset}${bold}${white}"	;# info
+set c0 "${reset}${bold}${magenta}"	;# first color
+set c1 "${reset}${magenta}"			;# second color
+
+## OUTPUT
+puts "
+${c0}     .-----.      ${nc}${user}${ic}@${nc}${host}${reset}
+${c0}   .\`    _  \`.    ${lc}OS:        ${ic}${os}${reset}
+${c0}   \`.   (${c1}_)   ${c0}\`.  ${lc}KERNEL:    ${ic}${kernel}${reset}
+${c0}     \`${c1}.        /  ${lc}UPTIME:    ${ic}${uptime}${reset}
+${c1}    .\`       .\`   ${lc}PACKAGES:  ${ic}${packages}${reset}
+${c1}   /       .\`     ${lc}SHELL:     ${ic}${shell}${reset}
+${c1}   \____.-\`\`       ${lc}${envtype}:        ${ic}${WM}${reset}
+"
