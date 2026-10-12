@@ -9,6 +9,29 @@ The implementation is a thin wrapper around Tcl 9.
 ## Why?
 Bash is bad.
 
+## Design notes
+
+### Readonly
+Bish has no equivalent of `readonly`.
+
+First thing first, if it had, it would be called `const`.
+
+Secondly, its a damned if you do, damned if you don't:
+* if you don't add it, someone will want it sooner or later
+* if you do add it, it may turn out that most people don't use it,
+  or if they do, they will have illusions about that it actually does
+
+Tcl is incapable of optimizing around constants,
+in fact, they would be marginally slower to operate on,
+since it would have to be a runtime assertion.
+
+Tcl also allows you to redefine anything into anything,
+so there is no sense of safety added.
+
+Const can used as a readability tool, to entail intent,
+however if your shell code is so complex that you require const,
+you probably should be using Perl at that point.
+
 ## Features
 For trivial scripts,
 Bish looks identiacal to Bourne derivatives.
@@ -44,3 +67,5 @@ emit {
 * powershell like variable manipulation
 * relevant builtin variables
 * relevant builtin functions
+* ::sys and ::tcl namespace to replace command/builtin
+* make sure set -euo pipefail is the default behaviour

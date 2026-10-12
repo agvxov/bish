@@ -7,6 +7,7 @@ namespace export lint
 # - [ ] $ in set
 # - [ ] # in a command line without ;
 # - [ ] space after \
+# - [ ] \ after comment
 # - [ ] unused var?
 # - [ ] possible variable misspelling?
 
