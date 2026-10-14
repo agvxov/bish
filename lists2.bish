@@ -1,0 +1,50 @@
+#!bish
+
+set files {
+    app.tcl
+    config.tcl
+    README.md
+    app.tcl
+    tests.tcl
+    old.tcl
+    utils.tcl
+}
+
+set excluded {
+    old.tcl
+    README.md
+}
+
+set files [l sort -unique $files]
+
+set deploy {}
+foreach f $files {
+    if {[l search -exact $excluded $f] < 0} {
+        l append deploy $f
+    }
+}
+
+set deploy [l insert $deploy 0 bootstrap.tcl]
+set deploy [l replace $deploy end end generated.tcl]
+set deploy [l replace $deploy 1 1 main.tcl]
+set deploy [l sort $deploy]
+
+set first  [l index $deploy 0]
+set last   [l index $deploy end]
+set middle [l range $deploy 1 end-1]
+
+set config [l --output release --verbose]
+set config [l replace $config 1 1 staging]
+set config [l insert $config end --force]
+set config [concat $config [list --include $first]]
+set config [l append config --exclude $last]
+
+set args [concat $config $deploy]
+set args [l replace $args 0 0 --destination]
+set preview [join $deploy ", "]
+set count [l size $deploy]
+
+puts "Deploying $count files: $preview"
+puts "First: $first; last: $last"
+puts "Middle files: [join $middle {, }]"
+puts "Command: deploy-tool [join $args { }]"

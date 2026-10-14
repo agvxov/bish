@@ -1,5 +1,52 @@
 namespace export pipe gunt ->
 
+# XXX
+proc ::bish::is_system {name} {
+    expr {[namespace which -command $name] eq ""}
+}
+
+proc reap_channel {chan} {
+    set ::err 0
+    try {
+        close $chan
+    } trap CHILDSTATUS {msg opts} {
+        set ::err [lindex [dict get $opts -errorcode] 2]
+    } trap CHILDKILLED {msg opts} - trap CHILDSUSP {msg opts} {
+        set ::err [expr {128 + [signal-number [lindex [dict get $opts -errorcode] 2]]}]
+    }
+}
+
+proc run_group {group data have} {
+    set cmdline {}
+    foreach c $group {
+        if {[llength $cmdline]} {
+            lappend cmdline |
+        }
+        lappend cmdline {*}$c
+    }
+    if {$have} {
+        if {$data ne ""} {
+            append data \n
+        }
+        lappend cmdline << $data
+    } else {
+        lappend cmdline <@ stdin
+    }
+    lappend cmdline 2>@1
+
+    flush stdout
+    flush stderr
+    set chan [open |$cmdline r]
+    fconfigure $chan -translation lf
+    set out [read $chan]
+    reap_channel $chan
+
+    if {[string index $out end] eq "\n"} {
+        set out [string range $out 0 end-1]
+    }
+    return $out
+}
+
 proc pipe {args} {
     set data {}
     set have 0

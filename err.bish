@@ -1,0 +1,14 @@
+proc a {} {
+    proc b {} {
+        puts b
+    }
+    proc c {} {
+        puts c
+        proc d {} {
+            err
+        }
+        d
+    }
+    c
+}
+a
